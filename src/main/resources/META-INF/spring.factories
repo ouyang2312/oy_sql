@@ -1,0 +1,2 @@
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+  com.oy.oy_sql.config.TenantAutoConfiguration
