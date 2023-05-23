@@ -1,5 +1,6 @@
 package com.oy.oy_sql.core;
 
+import com.alibaba.druid.DbType;
 import com.alibaba.druid.sql.SQLUtils;
 import com.alibaba.druid.sql.ast.SQLExpr;
 import com.alibaba.druid.sql.ast.SQLStatement;
@@ -10,7 +11,6 @@ import com.alibaba.druid.sql.ast.statement.*;
 import com.alibaba.druid.util.JdbcConstants;
 import com.oy.oy_sql.config.TenantProperties;
 import com.oy.oy_sql.impl.ITenantService;
-import jdk.nashorn.internal.objects.annotations.Getter;
 
 import java.util.List;
 
@@ -139,21 +139,34 @@ public class SqlParseService {
      */
     private String handleSelect(SQLSelectStatement sqlStatement) {
         SQLSelect select = sqlStatement.getSelect();
-
-        // 生成一个sqlExpr
-        SQLExpr expr = SQLUtils.toSQLExpr(tenantProperties.getTenantColumn() + " = " + tenantService.getTenantId(), JdbcConstants.MYSQL);
-
         SQLSelectQuery query = select.getQuery();
 
-        SQLSelectQueryBlock sqlSelectQueryBlock = (SQLSelectQueryBlock) query;
-        SQLExpr where = sqlSelectQueryBlock.getWhere();
-        sqlSelectQueryBlock.setWhere(expr);
-        sqlSelectQueryBlock.addWhere(where);
-        sqlStatement.setSelect(select);
-
-        return SQLUtils.toSQLString(sqlStatement);
+        handleQuery(query);
+        return SQLUtils.toSQLString(query);
     }
 
-
+    /***
+     * 处理查询
+     *
+     * @param query query
+     * @author ouyang
+     * @date 2023/5/23 9:25
+     */
+    private void handleQuery(SQLSelectQuery query) {
+        // 区分类型  SQLSelectQueryBlock 和 SQLUnionQuery
+        if (query instanceof SQLSelectQueryBlock) {
+            SQLSelectQueryBlock sqlSelectQueryBlock = (SQLSelectQueryBlock) query;
+            SQLExpr where = sqlSelectQueryBlock.getWhere();
+            sqlSelectQueryBlock.setWhere(
+                    SQLUtils.toSQLExpr(tenantProperties.getTenantColumn() + " = " + tenantService.getTenantId(), DbType.mysql)
+            );
+            sqlSelectQueryBlock.addWhere(where);
+        } else if (query instanceof SQLUnionQuery) {
+            SQLUnionQuery sqlUnionQuery = (SQLUnionQuery) query;
+            // 递归调用
+            handleQuery(sqlUnionQuery.getLeft());
+            handleQuery(sqlUnionQuery.getRight());
+        }
+    }
 
 }

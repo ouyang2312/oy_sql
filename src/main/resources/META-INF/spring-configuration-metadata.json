@@ -1,0 +1,19 @@
+{
+  "properties": [
+    {
+      "name": "oy.sql.tenantColumn",
+      "type": "java.lang.String",
+      "description": "租户字段比如公司id是company_id"
+    },
+    {
+      "name": "oy.sql.deleteColumn",
+      "type": "java.lang.String",
+      "description": "逻辑删除列，比如数据库的字段是is_delete"
+    },
+    {
+      "name": "oy.sql.deleteValue",
+      "type": "java.lang.Integer",
+      "description": "逻辑删除，比如is_delete 0是正常 1是删除 这里设置1"
+    }
+  ]
+}

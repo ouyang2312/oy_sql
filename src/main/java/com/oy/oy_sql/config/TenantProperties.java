@@ -1,8 +1,6 @@
 package com.oy.oy_sql.config;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
-import org.springframework.context.annotation.Configuration;
 
 /**
  * 租户自动
@@ -10,7 +8,6 @@ import org.springframework.context.annotation.Configuration;
  * @author ouyang
  * @createDate 2023/5/22 11:32
  */
-@Configuration
 @ConfigurationProperties(prefix = "oy.sql")
 public class TenantProperties {
 
@@ -27,7 +24,6 @@ public class TenantProperties {
     }
 
     public void setTenantColumn(String tenantColumn) {
-        System.out.println("a........");
         this.tenantColumn = tenantColumn;
     }
 
