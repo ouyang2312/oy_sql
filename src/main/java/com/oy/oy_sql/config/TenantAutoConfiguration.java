@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.extension.plugins.MybatisPlusInterceptor;
 import com.oy.oy_sql.core.SqlParseService;
 import com.oy.oy_sql.impl.ITenantService;
 import com.oy.oy_sql.intercep.MybatisPlusTenantInterceptor;
+import com.oy.oy_sql.intercep.MybatisTenantInterceptor;
 import com.oy.oy_sql.propertities.LogicDataProperties;
 import com.oy.oy_sql.propertities.TenantProperties;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,7 +50,7 @@ public class TenantAutoConfiguration {
     }
 
     /***
-     * 初始化拦截器
+     * mybatis-plus拦截器
      *
      * @return {@link MybatisPlusTenantInterceptor}
      * @author ouyang
@@ -60,6 +61,20 @@ public class TenantAutoConfiguration {
         MybatisPlusTenantInterceptor mybatisPlusTenantInterceptor = new MybatisPlusTenantInterceptor();
         mybatisPlusTenantInterceptor.setSqlParseService(sqlParseService());
         return mybatisPlusTenantInterceptor;
+    }
+
+    /***
+     * mybatis拦截器
+     *
+     * @return {@link MybatisTenantInterceptor}
+     * @author ouyang
+     * @date 2023/5/23 13:40
+     */
+    @Bean
+    public MybatisTenantInterceptor mybatisTenantInterceptor(){
+        MybatisTenantInterceptor mybatisTenantInterceptor = new MybatisTenantInterceptor();
+        mybatisTenantInterceptor.setSqlParseService(sqlParseService());
+        return mybatisTenantInterceptor;
     }
 
 }

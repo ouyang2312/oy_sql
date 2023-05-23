@@ -1,11 +1,15 @@
 package com.oy.oy_sql.intercep;
 
+import cn.hutool.core.util.ReflectUtil;
+import com.oy.oy_sql.core.SqlParseService;
+import com.sun.org.apache.bcel.internal.classfile.CodeException;
+import org.apache.ibatis.executor.statement.RoutingStatementHandler;
 import org.apache.ibatis.executor.statement.StatementHandler;
+import org.apache.ibatis.mapping.BoundSql;
+import org.apache.ibatis.mapping.MappedStatement;
 import org.apache.ibatis.plugin.*;
-import org.springframework.stereotype.Component;
-
+import java.lang.reflect.Field;
 import java.sql.Connection;
-import java.util.Properties;
 
 /**
  * 信息描述
@@ -16,24 +20,33 @@ import java.util.Properties;
 @Intercepts({@Signature(type = StatementHandler.class, method = "prepare", args = {Connection.class, Integer.class})})
 public class MybatisTenantInterceptor implements Interceptor {
 
+    private SqlParseService sqlParseService;
+
+    public void setSqlParseService(SqlParseService sqlParseService) {
+        this.sqlParseService = sqlParseService;
+    }
+
     @Override
     public Object intercept(Invocation invocation) throws Throwable {
-        // 拦截逻辑
-        // ...
-        System.out.println("aaaa");
+        // 获取路由器
+        RoutingStatementHandler statementHandler = (RoutingStatementHandler) invocation.getTarget();
+        StatementHandler delegate = (StatementHandler) ReflectUtil.getFieldValue(statementHandler, "delegate");
+        BoundSql boundSql = delegate.getBoundSql();
+        MappedStatement mappedStatement = (MappedStatement) ReflectUtil.getFieldValue(delegate, "mappedStatement");
 
-        // 调用原始方法
+        // 获取方法路径
+        String id = mappedStatement.getId();
+
+        // 反射替换拼接sql
+        Field field = boundSql.getClass().getDeclaredField("sql");
+        field.setAccessible(true);
+        try {
+            String parser = sqlParseService.parse(boundSql.getSql());
+            // 调用验证分片字段
+            field.set(boundSql, parser);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         return invocation.proceed();
-    }
-
-    @Override
-    public Object plugin(Object target) {
-        return Plugin.wrap(target, this);
-    }
-
-    @Override
-    public void setProperties(Properties properties) {
-        // 设置属性
-        // ...
     }
 }

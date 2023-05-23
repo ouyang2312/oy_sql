@@ -4,9 +4,7 @@ import com.alibaba.druid.DbType;
 import com.alibaba.druid.sql.SQLUtils;
 import com.alibaba.druid.sql.ast.SQLExpr;
 import com.alibaba.druid.sql.ast.SQLStatement;
-import com.alibaba.druid.sql.ast.expr.SQLBinaryOpExpr;
-import com.alibaba.druid.sql.ast.expr.SQLBinaryOperator;
-import com.alibaba.druid.sql.ast.expr.SQLIntegerExpr;
+import com.alibaba.druid.sql.ast.expr.*;
 import com.alibaba.druid.sql.ast.statement.*;
 import com.alibaba.druid.util.JdbcConstants;
 import com.oy.oy_sql.propertities.LogicDataProperties;
@@ -75,16 +73,13 @@ public class SqlParseService {
      * @date 2023/5/22 11:16
      */
     private String handleUpdate(SQLUpdateStatement sqlStatement) {
-        if (!tenantProperties.isOpen()) {
-            return SQLUtils.toSQLString(sqlStatement);
-        }
-
         SQLExpr where = sqlStatement.getWhere();
-        SQLExpr expr = SQLUtils.toSQLExpr(tenantProperties.getTenantColumn() + " = " + tenantService.getTenantId(), JdbcConstants.MYSQL);
-
-        SQLBinaryOpExpr sqlBinaryOpExpr = new SQLBinaryOpExpr(expr, where, SQLBinaryOperator.BooleanAnd);
-        sqlStatement.setWhere(sqlBinaryOpExpr);
-
+        // 拼接条件
+        SQLBinaryOpExpr sqlBinaryOpExpr = prepareExpr();
+        if (sqlBinaryOpExpr != null) {
+            sqlStatement.setWhere(sqlBinaryOpExpr);
+            sqlStatement.addWhere(where);
+        }
         return SQLUtils.toSQLString(sqlStatement);
     }
 
@@ -131,31 +126,22 @@ public class SqlParseService {
             sqlUpdateSetItem.setValue(new SQLIntegerExpr(1));
             sqlUpdateStatement.addItem(sqlUpdateSetItem);
 
-            // 条件
-            if (tenantProperties.isOpen()) {
-                SQLExpr expr = SQLUtils.toSQLExpr(tenantProperties.getTenantColumn() + " = " + tenantService.getTenantId(), JdbcConstants.MYSQL);
-                SQLBinaryOpExpr sqlBinaryOpExpr = new SQLBinaryOpExpr(expr, where, SQLBinaryOperator.BooleanAnd);
+            // 拼接条件
+            SQLBinaryOpExpr sqlBinaryOpExpr = prepareExpr();
+            if (sqlBinaryOpExpr != null) {
                 sqlUpdateStatement.setWhere(sqlBinaryOpExpr);
-            } else {
-                sqlUpdateStatement.setWhere(where);
+                sqlUpdateStatement.addWhere(where);
             }
             return SQLUtils.toSQLString(sqlUpdateStatement);
         } else {
-            if (tenantProperties.isOpen()) {
-                // 构造
-                SQLExpr logicalCondition = SQLUtils.toSQLExpr(tenantProperties.getTenantColumn() + " = " + tenantService.getTenantId());
-                // 获取原始删除条件
-                SQLExpr originalCondition = sqlStatement.getWhere();
-
-                // 将原始删除条件与逻辑删除条件进行组合
-                SQLBinaryOpExpr combinedCondition = new SQLBinaryOpExpr(originalCondition, logicalCondition, SQLBinaryOperator.BooleanAnd);
-                sqlStatement.setWhere(combinedCondition);
-                return SQLUtils.toSQLString(sqlStatement);
+            // 拼接条件
+            SQLBinaryOpExpr sqlBinaryOpExpr = prepareExpr();
+            if (sqlBinaryOpExpr != null) {
+                sqlStatement.setWhere(sqlBinaryOpExpr);
+                sqlStatement.addWhere(where);
             }
+            return SQLUtils.toSQLString(sqlStatement);
         }
-
-        // 返回正常的
-        return SQLUtils.toSQLString(sqlStatement);
     }
 
     /***
@@ -166,9 +152,6 @@ public class SqlParseService {
      * @date 2023/5/22 9:50
      */
     private String handleSelect(SQLSelectStatement sqlStatement) {
-        if (!tenantProperties.isOpen()) {
-            return SQLUtils.toSQLString(sqlStatement);
-        }
         SQLSelect select = sqlStatement.getSelect();
         SQLSelectQuery query = select.getQuery();
 
@@ -188,16 +171,51 @@ public class SqlParseService {
         if (query instanceof SQLSelectQueryBlock) {
             SQLSelectQueryBlock sqlSelectQueryBlock = (SQLSelectQueryBlock) query;
             SQLExpr where = sqlSelectQueryBlock.getWhere();
-            sqlSelectQueryBlock.setWhere(
-                    SQLUtils.toSQLExpr(tenantProperties.getTenantColumn() + " = " + tenantService.getTenantId(), DbType.mysql)
-            );
-            sqlSelectQueryBlock.addWhere(where);
+            // 拼接条件
+            SQLBinaryOpExpr sqlBinaryOpExpr = prepareExpr();
+            if (sqlBinaryOpExpr != null) {
+                sqlSelectQueryBlock.setWhere(sqlBinaryOpExpr);
+                sqlSelectQueryBlock.addWhere(where);
+            }
         } else if (query instanceof SQLUnionQuery) {
             SQLUnionQuery sqlUnionQuery = (SQLUnionQuery) query;
             // 递归调用
             handleQuery(sqlUnionQuery.getLeft());
             handleQuery(sqlUnionQuery.getRight());
         }
+    }
+
+    /***
+     * 准备拼接条件
+     *
+     * @return {@link SQLBinaryOpExpr}
+     * @author ouyang
+     * @date 2023/5/23 14:20
+     */
+    private SQLBinaryOpExpr prepareExpr() {
+        // delete
+        SQLBinaryOpExpr binaryOpExprDelete = null;
+        if (logicDataProperties.isOpen()) {
+            SQLIdentifierExpr column1ExprDelete = new SQLIdentifierExpr(logicDataProperties.getDeleteColumn());
+            SQLNumericLiteralExpr value1ExprDelete = new SQLIntegerExpr(0);
+            binaryOpExprDelete = new SQLBinaryOpExpr(column1ExprDelete, SQLBinaryOperator.Equality, value1ExprDelete);
+        }
+
+        // tenant_id
+        SQLBinaryOpExpr binaryOpExprTenantId = null;
+        if (tenantProperties.isOpen()) {
+            SQLIdentifierExpr column1ExprTenantId = new SQLIdentifierExpr(tenantProperties.getTenantColumn());
+            SQLNumericLiteralExpr value1ExprTenantId = new SQLIntegerExpr(1);
+            binaryOpExprTenantId = new SQLBinaryOpExpr(column1ExprTenantId, SQLBinaryOperator.Equality, value1ExprTenantId);
+        }
+
+        // 构建多个 SQLExpr 的表达式
+        if (binaryOpExprDelete != null && binaryOpExprTenantId != null) {
+            SQLBinaryOpExpr finalExpr = new SQLBinaryOpExpr(binaryOpExprTenantId, SQLBinaryOperator.BooleanAnd, binaryOpExprDelete);
+            return finalExpr;
+        }
+        // 不为空 则返回谁，如果都是空 则返回空
+        return binaryOpExprTenantId != null ? binaryOpExprTenantId : binaryOpExprDelete;
     }
 
 }
