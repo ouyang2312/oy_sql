@@ -1,30 +1,29 @@
-package com.oy.oy_sql.config;
+package com.oy.oy_sql.propertities;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 /**
- * 租户自动
+ * 逻辑删除数据 属性
  *
  * @author ouyang
- * @createDate 2023/5/22 11:32
+ * @createDate 2023/5/23 10:09
  */
-@ConfigurationProperties(prefix = "oy.sql")
-public class TenantProperties {
+@ConfigurationProperties(prefix = "oy.sql.delete")
+public class LogicDataProperties {
 
-    /** 租户id字段 */
-    private String tenantColumn;
+    /** 是否开启逻辑删除 true开启*/
+    private boolean open;
     /** 逻辑删除值 */
     private Integer deleteValue;
     /** 逻辑删除列 */
     private String deleteColumn;
 
-
-    public String getTenantColumn() {
-        return tenantColumn;
+    public boolean isOpen() {
+        return open;
     }
 
-    public void setTenantColumn(String tenantColumn) {
-        this.tenantColumn = tenantColumn;
+    public void setOpen(boolean open) {
+        this.open = open;
     }
 
     public Integer getDeleteValue() {

@@ -1,17 +1,27 @@
 {
   "properties": [
     {
-      "name": "oy.sql.tenantColumn",
+      "name": "oy.sql.tenant.open",
+      "type": "java.lang.Boolean",
+      "description": "是否开启租户id拼接 true开启，false关闭。"
+    },
+    {
+      "name": "oy.sql.tenant.tenantColumn",
       "type": "java.lang.String",
       "description": "租户字段比如公司id是company_id"
     },
     {
-      "name": "oy.sql.deleteColumn",
+      "name": "oy.sql.delete.open",
+      "type": "java.lang.Boolean",
+      "description": "是否开启逻辑删除 true开启，false关闭。"
+    },
+    {
+      "name": "oy.sql.delete.deleteColumn",
       "type": "java.lang.String",
       "description": "逻辑删除列，比如数据库的字段是is_delete"
     },
     {
-      "name": "oy.sql.deleteValue",
+      "name": "oy.sql.delete.deleteValue",
       "type": "java.lang.Integer",
       "description": "逻辑删除，比如is_delete 0是正常 1是删除 这里设置1"
     }
