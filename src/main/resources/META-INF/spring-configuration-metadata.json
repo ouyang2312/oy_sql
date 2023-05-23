@@ -3,27 +3,38 @@
     {
       "name": "oy.sql.tenant.open",
       "type": "java.lang.Boolean",
-      "description": "是否开启租户id拼接 true开启，false关闭。"
+      "description": "是否开启租户id拼接 true开启，false关闭。",
+      "sourceType": "com.oy.oy_sql.propertities.TenantProperties"
     },
     {
       "name": "oy.sql.tenant.tenantColumn",
       "type": "java.lang.String",
-      "description": "租户字段比如公司id是company_id"
+      "description": "租户字段比如公司id是company_id",
+      "sourceType": "com.oy.oy_sql.propertities.TenantProperties"
     },
     {
       "name": "oy.sql.delete.open",
       "type": "java.lang.Boolean",
-      "description": "是否开启逻辑删除 true开启，false关闭。"
+      "description": "是否开启逻辑删除 true开启，false关闭。",
+      "sourceType": "com.oy.oy_sql.propertities.LogicDataProperties"
     },
     {
       "name": "oy.sql.delete.deleteColumn",
       "type": "java.lang.String",
-      "description": "逻辑删除列，比如数据库的字段是is_delete"
+      "description": "逻辑删除列，比如数据库的字段是is_delete",
+      "sourceType": "com.oy.oy_sql.propertities.LogicDataProperties"
     },
     {
       "name": "oy.sql.delete.deleteValue",
       "type": "java.lang.Integer",
-      "description": "逻辑删除，比如is_delete 0是正常 1是删除 这里设置1"
+      "description": "逻辑删除，比如is_delete 0是正常 1是删除 这里设置1",
+      "sourceType": "com.oy.oy_sql.propertities.LogicDataProperties"
+    },
+    {
+      "name": "oy.sql.delete.normalValue",
+      "type": "java.lang.String",
+      "description": "逻辑删除，比如is_delete 0是正常 1是删除 这里设置0",
+      "sourceType": "com.oy.oy_sql.propertities.LogicDataProperties"
     }
   ]
 }

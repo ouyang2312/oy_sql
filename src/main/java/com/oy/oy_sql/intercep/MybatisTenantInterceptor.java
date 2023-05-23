@@ -2,7 +2,6 @@ package com.oy.oy_sql.intercep;
 
 import cn.hutool.core.util.ReflectUtil;
 import com.oy.oy_sql.core.SqlParseService;
-import com.sun.org.apache.bcel.internal.classfile.CodeException;
 import org.apache.ibatis.executor.statement.RoutingStatementHandler;
 import org.apache.ibatis.executor.statement.StatementHandler;
 import org.apache.ibatis.mapping.BoundSql;
@@ -12,7 +11,7 @@ import java.lang.reflect.Field;
 import java.sql.Connection;
 
 /**
- * 信息描述
+ * mybatis拦截器
  *
  * @author ouyang
  * @createDate 2023/5/23 11:46

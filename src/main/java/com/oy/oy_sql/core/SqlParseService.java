@@ -123,7 +123,7 @@ public class SqlParseService {
             // set 内容
             SQLUpdateSetItem sqlUpdateSetItem = new SQLUpdateSetItem();
             sqlUpdateSetItem.setColumn(SQLUtils.toSQLExpr(logicDataProperties.getDeleteColumn(), JdbcConstants.MYSQL));
-            sqlUpdateSetItem.setValue(new SQLIntegerExpr(1));
+            sqlUpdateSetItem.setValue(new SQLNumberExpr(Long.valueOf(logicDataProperties.getDeleteValue())));
             sqlUpdateStatement.addItem(sqlUpdateSetItem);
 
             // 拼接条件
@@ -197,7 +197,7 @@ public class SqlParseService {
         SQLBinaryOpExpr binaryOpExprDelete = null;
         if (logicDataProperties.isOpen()) {
             SQLIdentifierExpr column1ExprDelete = new SQLIdentifierExpr(logicDataProperties.getDeleteColumn());
-            SQLNumericLiteralExpr value1ExprDelete = new SQLIntegerExpr(0);
+            SQLNumericLiteralExpr value1ExprDelete = new SQLIntegerExpr(logicDataProperties.getNormalValue());
             binaryOpExprDelete = new SQLBinaryOpExpr(column1ExprDelete, SQLBinaryOperator.Equality, value1ExprDelete);
         }
 
@@ -205,7 +205,7 @@ public class SqlParseService {
         SQLBinaryOpExpr binaryOpExprTenantId = null;
         if (tenantProperties.isOpen()) {
             SQLIdentifierExpr column1ExprTenantId = new SQLIdentifierExpr(tenantProperties.getTenantColumn());
-            SQLNumericLiteralExpr value1ExprTenantId = new SQLIntegerExpr(1);
+            SQLNumericLiteralExpr value1ExprTenantId = new SQLIntegerExpr(Long.valueOf(tenantService.getTenantId()));
             binaryOpExprTenantId = new SQLBinaryOpExpr(column1ExprTenantId, SQLBinaryOperator.Equality, value1ExprTenantId);
         }
 
