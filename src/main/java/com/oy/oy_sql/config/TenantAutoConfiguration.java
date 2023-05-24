@@ -6,9 +6,9 @@ import com.oy.oy_sql.impl.ITenantService;
 import com.oy.oy_sql.intercep.MybatisPlusTenantInterceptor;
 import com.oy.oy_sql.intercep.MybatisTenantInterceptor;
 import com.oy.oy_sql.propertities.LogicDataProperties;
+import com.oy.oy_sql.propertities.NoProcessingRequiredProperties;
 import com.oy.oy_sql.propertities.TenantProperties;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -21,7 +21,8 @@ import org.springframework.context.annotation.Configuration;
  */
 @EnableConfigurationProperties({
         TenantProperties.class,
-        LogicDataProperties.class
+        LogicDataProperties.class,
+        NoProcessingRequiredProperties.class
 })
 @Configuration
 public class TenantAutoConfiguration {
@@ -32,6 +33,8 @@ public class TenantAutoConfiguration {
     ITenantService tenantService;
     @Autowired
     LogicDataProperties logicDataProperties;
+    @Autowired
+    NoProcessingRequiredProperties noProcessingRequiredProperties;
 
     /***
      * 把解析服务加入ioc
@@ -46,6 +49,7 @@ public class TenantAutoConfiguration {
         sqlParseService.setTenantProperties(tenantProperties);
         sqlParseService.setTenantService(tenantService);
         sqlParseService.setLogicDataProperties(logicDataProperties);
+        sqlParseService.setNoProcessingRequiredProperties(noProcessingRequiredProperties);
         return sqlParseService;
     }
 

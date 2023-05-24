@@ -51,7 +51,7 @@ public class MybatisPlusTenantInterceptor implements InnerInterceptor {
          */
         /** 1. 获取sql */
         String sql = boundSql.getSql();
-        String parse = sqlParseService.parse(sql);
+        String parse = sqlParseService.parse(sql, sql);
 
         // 修改sql
         Field field = null;
@@ -84,6 +84,7 @@ public class MybatisPlusTenantInterceptor implements InnerInterceptor {
         PluginUtils.MPStatementHandler mpSh = PluginUtils.mpStatementHandler(sh);
         MappedStatement ms = mpSh.mappedStatement();
         SqlCommandType sct = ms.getSqlCommandType();
+        String id = ms.getId();
 
         if (sct == SqlCommandType.INSERT || sct == SqlCommandType.UPDATE || sct == SqlCommandType.DELETE) {
             if (InterceptorIgnoreHelper.willIgnoreTenantLine(ms.getId())) {
@@ -93,7 +94,7 @@ public class MybatisPlusTenantInterceptor implements InnerInterceptor {
             PluginUtils.MPBoundSql mpBs = mpSh.mPBoundSql();
             String sql = mpBs.sql();
 
-            String parse = sqlParseService.parse(sql);
+            String parse = sqlParseService.parse(sql, id);
             mpBs.sql(parse);
         }
     }

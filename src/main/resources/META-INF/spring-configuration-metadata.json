@@ -35,6 +35,24 @@
       "type": "java.lang.String",
       "description": "逻辑删除，比如is_delete 0是正常 1是删除 这里设置0",
       "sourceType": "com.oy.oy_sql.propertities.LogicDataProperties"
+    },
+    {
+      "name": "oy.sql.handle.noTenantIds",
+      "type": "java.util.List",
+      "description": "不需要拼接租户id集合",
+      "sourceType": "com.oy.oy_sql.propertities.NoProcessingRequiredProperties"
+    },
+    {
+      "name": "oy.sql.handle.deleteIds",
+      "type": "java.util.List",
+      "description": "不需要逻辑删除",
+      "sourceType": "com.oy.oy_sql.propertities.NoProcessingRequiredProperties"
+    },
+    {
+      "name": "oy.sql.handle.noTenantTables",
+      "type": "java.util.List",
+      "description": "没有租户id的表",
+      "sourceType": "com.oy.oy_sql.propertities.NoProcessingRequiredProperties"
     }
   ]
 }

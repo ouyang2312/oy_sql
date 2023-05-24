@@ -40,7 +40,7 @@ public class MybatisTenantInterceptor implements Interceptor {
         Field field = boundSql.getClass().getDeclaredField("sql");
         field.setAccessible(true);
         try {
-            String parser = sqlParseService.parse(boundSql.getSql());
+            String parser = sqlParseService.parse(boundSql.getSql(),id);
             // 调用验证分片字段
             field.set(boundSql, parser);
         } catch (Exception e) {
