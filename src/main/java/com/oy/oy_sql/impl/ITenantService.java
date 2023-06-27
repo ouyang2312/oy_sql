@@ -9,6 +9,6 @@ package com.oy.oy_sql.impl;
 public interface ITenantService {
 
     /** 获取租户id */
-    String getTenantId();
+    Long getTenantId();
 
 }

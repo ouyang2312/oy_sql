@@ -10,6 +10,7 @@ import com.oy.oy_sql.propertities.LogicDataProperties;
 import com.oy.oy_sql.propertities.NoProcessingRequiredProperties;
 import com.oy.oy_sql.propertities.TenantProperties;
 import com.oy.oy_sql.impl.ITenantService;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
 
@@ -21,26 +22,14 @@ import java.util.List;
  */
 public class SqlParseService {
 
+    @Autowired
     private ITenantService tenantService;
+    @Autowired
     private TenantProperties tenantProperties;
+    @Autowired
     private LogicDataProperties logicDataProperties;
+    @Autowired
     private NoProcessingRequiredProperties noProcessingRequiredProperties;
-
-    public void setTenantService(ITenantService tenantService) {
-        this.tenantService = tenantService;
-    }
-
-    public void setTenantProperties(TenantProperties tenantProperties) {
-        this.tenantProperties = tenantProperties;
-    }
-
-    public void setLogicDataProperties(LogicDataProperties logicDataProperties) {
-        this.logicDataProperties = logicDataProperties;
-    }
-
-    public void setNoProcessingRequiredProperties(NoProcessingRequiredProperties noProcessingRequiredProperties) {
-        this.noProcessingRequiredProperties = noProcessingRequiredProperties;
-    }
 
     /***
      * parse
@@ -105,7 +94,7 @@ public class SqlParseService {
 
         sqlStatement.addColumn(SQLUtils.toSQLExpr(tenantProperties.getTenantColumn()));
         SQLInsertStatement.ValuesClause values = sqlStatement.getValues();
-        values.addValue(SQLUtils.toSQLExpr(tenantService.getTenantId()));
+        values.addValue(SQLUtils.toSQLExpr(String.valueOf(tenantService.getTenantId())));
 
         return SQLUtils.toSQLString(sqlStatement);
     }
@@ -230,7 +219,7 @@ public class SqlParseService {
         SQLBinaryOpExpr binaryOpExprTenantId = null;
         if (tenantProperties.isOpen() && !tenantIdFlag(mapperId) && !noTenantTableFlag(simpleName) && !deleteFlag) {
             SQLIdentifierExpr column1ExprTenantId = new SQLIdentifierExpr(tenantProperties.getTenantColumn());
-            SQLNumericLiteralExpr value1ExprTenantId = new SQLIntegerExpr(Long.valueOf(tenantService.getTenantId()));
+            SQLNumericLiteralExpr value1ExprTenantId = new SQLIntegerExpr(tenantService.getTenantId());
             binaryOpExprTenantId = new SQLBinaryOpExpr(column1ExprTenantId, SQLBinaryOperator.Equality, value1ExprTenantId);
         }
 

@@ -7,6 +7,8 @@ import org.apache.ibatis.executor.statement.StatementHandler;
 import org.apache.ibatis.mapping.BoundSql;
 import org.apache.ibatis.mapping.MappedStatement;
 import org.apache.ibatis.plugin.*;
+import org.springframework.beans.factory.annotation.Autowired;
+
 import java.lang.reflect.Field;
 import java.sql.Connection;
 
@@ -19,11 +21,8 @@ import java.sql.Connection;
 @Intercepts({@Signature(type = StatementHandler.class, method = "prepare", args = {Connection.class, Integer.class})})
 public class MybatisTenantInterceptor implements Interceptor {
 
+    @Autowired
     private SqlParseService sqlParseService;
-
-    public void setSqlParseService(SqlParseService sqlParseService) {
-        this.sqlParseService = sqlParseService;
-    }
 
     @Override
     public Object intercept(Invocation invocation) throws Throwable {

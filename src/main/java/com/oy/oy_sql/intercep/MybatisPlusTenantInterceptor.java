@@ -11,6 +11,7 @@ import org.apache.ibatis.mapping.MappedStatement;
 import org.apache.ibatis.mapping.SqlCommandType;
 import org.apache.ibatis.session.ResultHandler;
 import org.apache.ibatis.session.RowBounds;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.lang.reflect.Field;
 import java.sql.Connection;
@@ -24,11 +25,8 @@ import java.sql.SQLException;
  */
 public class MybatisPlusTenantInterceptor implements InnerInterceptor {
 
+    @Autowired
     private SqlParseService sqlParseService;
-
-    public void setSqlParseService(SqlParseService sqlParseService) {
-        this.sqlParseService = sqlParseService;
-    }
 
     /***
      * 查询之前

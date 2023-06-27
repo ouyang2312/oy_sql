@@ -1,14 +1,11 @@
 package com.oy.oy_sql.config;
 
-import com.baomidou.mybatisplus.extension.plugins.MybatisPlusInterceptor;
 import com.oy.oy_sql.core.SqlParseService;
-import com.oy.oy_sql.impl.ITenantService;
 import com.oy.oy_sql.intercep.MybatisPlusTenantInterceptor;
 import com.oy.oy_sql.intercep.MybatisTenantInterceptor;
 import com.oy.oy_sql.propertities.LogicDataProperties;
 import com.oy.oy_sql.propertities.NoProcessingRequiredProperties;
 import com.oy.oy_sql.propertities.TenantProperties;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -27,15 +24,6 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class TenantAutoConfiguration {
 
-    @Autowired
-    TenantProperties tenantProperties;
-    @Autowired
-    ITenantService tenantService;
-    @Autowired
-    LogicDataProperties logicDataProperties;
-    @Autowired
-    NoProcessingRequiredProperties noProcessingRequiredProperties;
-
     /***
      * 把解析服务加入ioc
      *
@@ -46,10 +34,6 @@ public class TenantAutoConfiguration {
     @Bean
     public SqlParseService sqlParseService(){
         SqlParseService sqlParseService = new SqlParseService();
-        sqlParseService.setTenantProperties(tenantProperties);
-        sqlParseService.setTenantService(tenantService);
-        sqlParseService.setLogicDataProperties(logicDataProperties);
-        sqlParseService.setNoProcessingRequiredProperties(noProcessingRequiredProperties);
         return sqlParseService;
     }
 
@@ -63,7 +47,6 @@ public class TenantAutoConfiguration {
     @Bean
     public MybatisPlusTenantInterceptor mybatisPlusTenantInterceptor(){
         MybatisPlusTenantInterceptor mybatisPlusTenantInterceptor = new MybatisPlusTenantInterceptor();
-        mybatisPlusTenantInterceptor.setSqlParseService(sqlParseService());
         return mybatisPlusTenantInterceptor;
     }
 
@@ -77,7 +60,6 @@ public class TenantAutoConfiguration {
     @Bean
     public MybatisTenantInterceptor mybatisTenantInterceptor(){
         MybatisTenantInterceptor mybatisTenantInterceptor = new MybatisTenantInterceptor();
-        mybatisTenantInterceptor.setSqlParseService(sqlParseService());
         return mybatisTenantInterceptor;
     }
 
